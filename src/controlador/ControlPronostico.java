@@ -33,8 +33,10 @@ public class ControlPronostico {
         this.vista.btnModificaAddActionListener(listener);
         this.vista.btnNuevoAddActionListener(listener);
         
+        ventasHistorico = new ArrayList<Double>();
+        
         for (int i = 0; i < this.vista.numFilasHistorico(); i++) {
-            ventasHistorico.add(this.vista.getVentaHistorico(i+1));
+            ventasHistorico.add(this.vista.getVentaHistorico(i));
         }
     }
     private void reHcerHistorico()
@@ -42,16 +44,16 @@ public class ControlPronostico {
         Object[][] registroH = new Object[ventasHistorico.size()+1][4];
             for(int i=1;i<=ventasHistorico.size();i++)
             {
-                registroH[i][1]= i;
-                registroH[i][3]= ventasHistorico.get(i-1);
-                registroH[i][4]= null;
-                registroH[i][5]= null;
+                registroH[i][0]= i;
+                registroH[i][1]= ventasHistorico.get(i-1);
+                registroH[i][2]= null;
+                registroH[i][3]= null;
 
             }
-            registroH[ventasHistorico.size()+1][1]=null;
-            registroH[ventasHistorico.size()+1][2]=null;
-            registroH[ventasHistorico.size()+1][3]="Total: ";
-            registroH[ventasHistorico.size()+1][4]=null;
+            registroH[ventasHistorico.size()][0]=null;
+            registroH[ventasHistorico.size()][1]=null;
+            registroH[ventasHistorico.size()][2]="Total: ";
+            registroH[ventasHistorico.size()][3]=null;
             
          vista.llenarHistorico(registroH);
     }
@@ -79,7 +81,7 @@ public class ControlPronostico {
         else
         {
             vista.quitarFilaHistorico(fila);
-            ventasHistorico.remove(fila-1);
+            ventasHistorico.remove(fila);
             reHcerHistorico();
             hacerCuentas();
         }
@@ -111,28 +113,28 @@ public class ControlPronostico {
     private void hacerCuentas()
     {
         Object[][] cuentasHistorico= new Object[ventasHistorico.size()+1][4];
-        for (int i = 2; i <= ventasHistorico.size(); i++) 
+        for (int i = 1; i <ventasHistorico.size(); i++) 
         {
             double actual = vista.getVentaHistorico(i);
             double anterior = vista.getVentaHistorico(i-1);
             
-            cuentasHistorico[i][3] = modelo.calcularResta(actual, anterior);
-            cuentasHistorico[i][4] = modelo.calcularVariacion(actual, anterior);         
+            cuentasHistorico[i][2] = modelo.calcularResta(actual, anterior);
+            cuentasHistorico[i][3] = modelo.calcularVariacion(actual, anterior);         
         }
-        cuentasHistorico[ventasHistorico.size()+1][3]="Total: ";
-        cuentasHistorico[ventasHistorico.size()+1][4]= modelo.calcularSuma();
+        cuentasHistorico[ventasHistorico.size()][2]="Total: ";
+        cuentasHistorico[ventasHistorico.size()][3]= modelo.calcularSuma();
         
         double promedioSum = modelo.promedioSum();
         vista.setPromedio(promedioSum+"");
         int filas = Integer.parseInt(vista.getCantidad());
         
         Object[][] cuentasPronostico = new Object[filas][2];
-        cuentasPronostico [1][2]= Double.parseDouble(vista.getCantidadVenta());
-        for (int i = 1; i <= filas; i++) 
+        cuentasPronostico [0][1]= Double.parseDouble(vista.getCantidadVenta());
+        for (int i = 1; i < filas; i++) 
         {
-            double anterior = (double)cuentasPronostico[i-1][2];
-            cuentasPronostico[i][1]= i;
-            cuentasPronostico[i][2]= anterior+anterior*promedioSum;
+            double anterior = (double)cuentasPronostico[i-1][1];
+            cuentasPronostico[i][0]= i;
+            cuentasPronostico[i][1]= anterior+anterior*promedioSum;
         }
         vista.llenarHistorico(cuentasHistorico);
         vista.llenarPronostico(cuentasPronostico);
@@ -144,7 +146,6 @@ public class ControlPronostico {
         @Override
         public void actionPerformed(ActionEvent e) 
         {
-            System.out.println("asdf");
             if(vista.getCantidad().trim().equals(""))
             {
                 vista.mensaje("el campo de los años a pronosticar esta vacio");

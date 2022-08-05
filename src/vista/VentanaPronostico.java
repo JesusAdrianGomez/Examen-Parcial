@@ -249,7 +249,7 @@ public class VentanaPronostico extends JFrame{
     
     public void quitarFilaHistorico(int i)
     {
-        tblHistoricoVentas.removeRowSelectionInterval(i-1, i);
+        tblHistoricoVentas.removeRowSelectionInterval(i, i);
     }
     
     public double getVentaHistorico()
